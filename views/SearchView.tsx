@@ -13,6 +13,7 @@ export const SearchView: React.FC<SearchViewProps> = ({ onAddToCart }) => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<any>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [editPrompt, setEditPrompt] = useState('');
   const [mode, setMode] = useState<'search' | 'edit'>('search');
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -25,6 +26,7 @@ export const SearchView: React.FC<SearchViewProps> = ({ onAddToCart }) => {
         const base64 = reader.result as string;
         setSelectedImage(base64.split(',')[1]); // Remove data:image/...;base64,
         setAnalysisResult(null);
+        setErrorMessage(null);
       };
       reader.readAsDataURL(file);
     }
@@ -33,18 +35,26 @@ export const SearchView: React.FC<SearchViewProps> = ({ onAddToCart }) => {
   const handleAnalyze = async () => {
     if (!selectedImage) return;
     setIsAnalyzing(true);
+    setErrorMessage(null);
     const result = await analyzeImageForTags(selectedImage);
-    setAnalysisResult(result);
+    if (!result) {
+      setErrorMessage("Impossible d'analyser l'image. Vérifiez que la clé GEMINI_API_KEY est bien configurée.");
+    } else {
+      setAnalysisResult(result);
+    }
     setIsAnalyzing(false);
   };
 
   const handleEdit = async () => {
     if (!selectedImage || !editPrompt) return;
     setIsEditing(true);
+    setErrorMessage(null);
     const result = await editImageWithPrompt(selectedImage, editPrompt);
     if (result) {
       setSelectedImage(result);
       setAnalysisResult(null); // Reset analysis as image changed
+    } else {
+      setErrorMessage("Impossible de modifier l'image. Vérifiez votre clé GEMINI_API_KEY.");
     }
     setIsEditing(false);
   };
@@ -108,6 +118,12 @@ export const SearchView: React.FC<SearchViewProps> = ({ onAddToCart }) => {
             </div>
         )}
       </div>
+
+      {errorMessage && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
+          {errorMessage}
+        </div>
+      )}
 
       {/* Logic for Search Mode */}
       {mode === 'search' && selectedImage && (

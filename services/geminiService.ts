@@ -1,80 +1,56 @@
-import { GoogleGenAI, Type } from "@google/genai";
+// Client-side service calling serverless /api endpoints to keep API keys secure
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+export interface ImageAnalysisResult {
+  item?: string;
+  color?: string;
+  brand?: string;
+  category?: string;
+}
 
-// Image Analysis Logic (Search)
-export const analyzeImageForTags = async (base64Image: string): Promise<any> => {
+// Image Analysis Logic (calls Vercel serverless /api/analyze)
+export const analyzeImageForTags = async (base64Image: string): Promise<ImageAnalysisResult | null> => {
   try {
-    const response = await ai.models.generateContent({
-      model: 'gemini-3-pro-preview', // MUST use this model for image understanding per requirement
-      contents: {
-        parts: [
-          {
-            inlineData: {
-              mimeType: 'image/jpeg',
-              data: base64Image,
-            },
-          },
-          {
-            text: `Analyze this product image and return a JSON object with the following fields: 
-                   "item" (generic name), "color" (dominant color), "brand" (if visible, else "Generic"), "category" (e.g., Fashion, Electronics).
-                   Ensure the output is valid JSON.`
-          },
-        ],
+    const response = await fetch('/api/analyze', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
       },
-      config: {
-        responseMimeType: 'application/json',
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            item: { type: Type.STRING },
-            color: { type: Type.STRING },
-            brand: { type: Type.STRING },
-            category: { type: Type.STRING },
-          },
-        },
-      },
+      body: JSON.stringify({ base64Image }),
     });
 
-    return JSON.parse(response.text || '{}');
+    if (!response.ok) {
+      const errData = await response.json().catch(() => ({}));
+      throw new Error(errData.error || `Request failed with status ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data.result || null;
   } catch (error) {
-    console.error("Gemini Analysis Error:", error);
+    console.error('Gemini Analysis Error:', error);
     return null;
   }
 };
 
-// Image Editing Logic (Nano Banana)
+// Image Editing Logic (calls Vercel serverless /api/edit)
 export const editImageWithPrompt = async (base64Image: string, prompt: string): Promise<string | null> => {
   try {
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash-image', // Nano banana for editing
-      contents: {
-        parts: [
-          {
-            inlineData: {
-              mimeType: 'image/jpeg',
-              data: base64Image,
-            },
-          },
-          {
-            text: prompt,
-          },
-        ],
+    const response = await fetch('/api/edit', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
       },
-      // Note: Nano banana series does not support responseMimeType or responseSchema
+      body: JSON.stringify({ base64Image, prompt }),
     });
 
-    // Extract image from response parts
-    if (response.candidates && response.candidates[0].content.parts) {
-      for (const part of response.candidates[0].content.parts) {
-        if (part.inlineData) {
-          return part.inlineData.data;
-        }
-      }
+    if (!response.ok) {
+      const errData = await response.json().catch(() => ({}));
+      throw new Error(errData.error || `Request failed with status ${response.status}`);
     }
-    return null;
+
+    const data = await response.json();
+    return data.result || null;
   } catch (error) {
-    console.error("Gemini Edit Error:", error);
+    console.error('Gemini Edit Error:', error);
     return null;
   }
 };
