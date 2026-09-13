@@ -1,0 +1,10 @@
+{
+  "name": "MarketCam",
+  "description": "Hyperlocal Marketplace for Cameroon with AI-powered search, tiered incentives, and secure delivery logistics.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone",
+    "geolocation"
+  ],
+  "majorCapabilities": []
+}
