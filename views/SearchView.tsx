@@ -72,25 +72,25 @@ export const SearchView: React.FC<SearchViewProps> = ({ onAddToCart }) => {
   return (
     <div className="p-4 space-y-6">
       {/* Mode Switcher */}
-      <div className="flex bg-gray-200 rounded-lg p-1">
+      <div className="flex bg-border rounded-md p-1">
         <button
           onClick={() => setMode('search')}
-          className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${mode === 'search' ? 'bg-white shadow text-primary' : 'text-gray-600'}`}
+          className={`flex-1 py-2 text-sm font-medium rounded-sm transition ${mode === 'search' ? 'bg-surface text-secondary shadow-sm border border-border' : 'text-gray-500'}`}
         >
-          Nano Search
+          Visual Search
         </button>
         <button
           onClick={() => setMode('edit')}
-          className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${mode === 'edit' ? 'bg-white shadow text-primary' : 'text-gray-600'}`}
+          className={`flex-1 py-2 text-sm font-medium rounded-sm transition ${mode === 'edit' ? 'bg-surface text-secondary shadow-sm border border-border' : 'text-gray-500'}`}
         >
-          AI Editor
+          Edit Image
         </button>
       </div>
 
       {/* Image Upload Area */}
       <div 
         onClick={() => fileInputRef.current?.click()}
-        className="border-2 border-dashed border-gray-300 rounded-xl bg-gray-50 h-64 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-100 transition relative overflow-hidden"
+        className={`border border-border rounded-lg flex flex-col items-center justify-center cursor-pointer transition relative overflow-hidden ${selectedImage ? 'bg-secondary h-64' : 'bg-surface h-48 hover:bg-background'}`}
       >
         {selectedImage ? (
           <img 
@@ -100,9 +100,8 @@ export const SearchView: React.FC<SearchViewProps> = ({ onAddToCart }) => {
           />
         ) : (
           <div className="text-center p-6">
-            <Camera className="mx-auto h-12 w-12 text-gray-400 mb-2" />
-            <p className="text-sm text-gray-500 font-medium">Tap to upload photo</p>
-            <p className="text-xs text-gray-400 mt-1">Take a pic of what you want to find</p>
+            <Camera className="mx-auto h-8 w-8 text-gray-400 mb-2" />
+            <p className="text-sm text-secondary font-medium">Select photo</p>
           </div>
         )}
         <input 
@@ -113,14 +112,14 @@ export const SearchView: React.FC<SearchViewProps> = ({ onAddToCart }) => {
           onChange={handleFileChange} 
         />
         {selectedImage && (
-            <div className="absolute bottom-2 right-2 bg-black/50 text-white text-xs px-2 py-1 rounded">
+            <div className="absolute bottom-2 right-2 bg-secondary/80 text-white text-xs px-2 py-1 rounded">
                 Tap to change
             </div>
         )}
       </div>
 
       {errorMessage && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
           {errorMessage}
         </div>
       )}
@@ -132,37 +131,37 @@ export const SearchView: React.FC<SearchViewProps> = ({ onAddToCart }) => {
             <button
               onClick={handleAnalyze}
               disabled={isAnalyzing}
-              className="w-full bg-primary text-white py-3 rounded-xl font-bold flex items-center justify-center space-x-2 shadow-lg disabled:opacity-50"
+              className="w-full bg-primary text-white py-3 rounded-md font-medium flex items-center justify-center space-x-2 transition disabled:opacity-50"
             >
-              {isAnalyzing ? <Loader2 className="animate-spin" /> : <Sparkles />}
-              <span>{isAnalyzing ? 'Analyzing with Gemini...' : 'Find with Nano Search'}</span>
+              {isAnalyzing && <Loader2 className="animate-spin" size={18} />}
+              <span>{isAnalyzing ? 'Scanning image...' : 'Scan & Search'}</span>
             </button>
           )}
 
           {analysisResult && (
-            <div className="bg-white p-4 rounded-xl shadow border border-gray-100 animate-fade-in">
-              <h3 className="font-bold text-gray-800 mb-2">Gemini Analysis</h3>
+            <div className="bg-surface p-4 rounded-lg border border-border">
+              <h3 className="font-display font-semibold text-secondary mb-2">Scan Results</h3>
               <div className="flex flex-wrap gap-2 mb-4">
                 {Object.entries(analysisResult).map(([key, value]) => (
-                  <span key={key} className="px-3 py-1 bg-green-50 text-primary text-xs rounded-full border border-green-100 capitalize">
-                    {key}: {String(value)}
+                  <span key={key} className="px-2 py-1 bg-background text-secondary text-xs rounded border border-border capitalize">
+                    <span className="opacity-60 mr-1">{key}:</span>{String(value)}
                   </span>
                 ))}
               </div>
               
-              <h4 className="font-medium text-gray-600 text-sm mb-3">Nearby Matches ({matchedItems.length})</h4>
+              <h4 className="font-medium text-secondary text-sm mb-3">Nearby Matches ({matchedItems.length})</h4>
               {matchedItems.length > 0 ? (
                 <div className="space-y-3">
                   {matchedItems.map(item => (
-                    <div key={item.id} className="flex bg-gray-50 p-2 rounded-lg border border-gray-200">
+                    <div key={item.id} className="flex bg-background p-2 rounded-md border border-border">
                       <img src={item.image} className="w-16 h-16 object-cover rounded" alt={item.name} />
                       <div className="ml-3 flex-1">
-                        <h5 className="font-bold text-gray-800 text-sm">{item.name}</h5>
-                        <p className="text-primary font-bold text-sm">{item.price.toLocaleString()} XAF</p>
+                        <h5 className="font-medium text-secondary text-sm">{item.name}</h5>
+                        <p className="text-primary font-semibold text-sm">{item.price.toLocaleString()} XAF</p>
                       </div>
                       <button 
                         onClick={() => onAddToCart(item)}
-                        className="bg-primary text-white p-2 rounded-lg self-center"
+                        className="bg-primary text-white p-2 rounded-md self-center hover:opacity-90 transition"
                       >
                         <Plus size={18} />
                       </button>
@@ -170,7 +169,7 @@ export const SearchView: React.FC<SearchViewProps> = ({ onAddToCart }) => {
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-gray-500 italic">No exact matches found nearby.</p>
+                <p className="text-sm text-gray-500">No exact matches found nearby.</p>
               )}
             </div>
           )}
@@ -180,25 +179,24 @@ export const SearchView: React.FC<SearchViewProps> = ({ onAddToCart }) => {
       {/* Logic for Edit Mode */}
       {mode === 'edit' && selectedImage && (
         <div className="space-y-4">
-          <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
-             <label className="block text-sm font-medium text-gray-700 mb-2">How should Gemini edit this?</label>
+          <div className="bg-surface p-4 rounded-lg border border-border">
+             <label className="block text-sm font-medium text-secondary mb-2">Edit instructions</label>
              <div className="flex gap-2">
                <input
                  type="text"
                  value={editPrompt}
                  onChange={(e) => setEditPrompt(e.target.value)}
-                 placeholder="e.g., 'Add a retro filter', 'Remove background'"
-                 className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-primary focus:border-primary"
+                 placeholder="e.g., 'Remove background'"
+                 className="flex-1 border border-border rounded-md px-3 py-2 text-sm focus:outline-none focus:border-primary"
                />
                <button
                  onClick={handleEdit}
                  disabled={isEditing || !editPrompt}
-                 className="bg-secondary text-white p-2 rounded-lg disabled:opacity-50"
+                 className="bg-primary text-white p-2 rounded-md disabled:opacity-50 transition"
                >
-                 {isEditing ? <Loader2 className="animate-spin" /> : <Wand2 />}
+                 {isEditing ? <Loader2 className="animate-spin" size={18} /> : <Wand2 size={18} />}
                </button>
              </div>
-             <p className="text-xs text-gray-400 mt-2">Powered by gemini-2.5-flash-image</p>
           </div>
         </div>
       )}

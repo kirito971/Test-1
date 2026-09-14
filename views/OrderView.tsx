@@ -66,13 +66,13 @@ export const OrderView: React.FC<OrderViewProps> = ({ user }) => {
 
   const renderStatusBadge = () => {
     const colors: Record<string, string> = {
-      [OrderStatus.PENDING]: 'bg-yellow-100 text-yellow-800',
-      [OrderStatus.COMPLETED]: 'bg-green-100 text-green-800',
-      [OrderStatus.DELIVERY_IN_PROGRESS]: 'bg-blue-100 text-blue-800',
+      [OrderStatus.PENDING]: 'bg-yellow-50 text-yellow-700 border-yellow-200',
+      [OrderStatus.COMPLETED]: 'bg-green-50 text-green-700 border-green-200',
+      [OrderStatus.DELIVERY_IN_PROGRESS]: 'bg-blue-50 text-blue-700 border-blue-200',
     };
-    const defaultColor = 'bg-gray-100 text-gray-800';
+    const defaultColor = 'bg-background text-secondary border-border';
     return (
-      <span className={`px-2 py-1 rounded text-xs font-bold ${colors[order.status] || defaultColor}`}>
+      <span className={`px-2 py-1 rounded text-xs font-medium border ${colors[order.status] || defaultColor}`}>
         {order.status.replace(/_/g, ' ')}
       </span>
     );
@@ -82,24 +82,24 @@ export const OrderView: React.FC<OrderViewProps> = ({ user }) => {
   if (user.role === UserRole.WHOLESALER) {
     return (
       <div className="p-4 space-y-6">
-        <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
-           <h3 className="font-bold text-lg mb-2">Order #{order.id}</h3>
+        <div className="bg-surface p-4 rounded-lg border border-border">
+           <h3 className="font-semibold text-secondary text-lg mb-2">Order #{order.id}</h3>
            {renderStatusBadge()}
            
            {order.status === OrderStatus.PENDING && (
              <div className="mt-4">
-               <h4 className="text-sm font-bold text-gray-700 mb-2">Smart Logistics: Select Driver</h4>
+               <h4 className="text-sm font-semibold text-secondary mb-2">Select Driver</h4>
                <p className="text-xs text-gray-500 mb-3">Drivers sorted by location & rating</p>
                <div className="space-y-2">
                  {MOCK_DRIVERS.map(driver => (
-                   <div key={driver.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg border border-gray-100">
+                   <div key={driver.id} className="flex justify-between items-center p-3 bg-background rounded-md border border-border">
                      <div>
-                       <p className="font-bold text-sm">{driver.name}</p>
+                       <p className="font-medium text-sm text-secondary">{driver.name}</p>
                        <p className="text-xs text-gray-500">⭐ {driver.rating} • {driver.status}</p>
                      </div>
                      <button 
                        onClick={() => handleSelectDriver(driver)}
-                       className="bg-primary text-white text-xs px-3 py-2 rounded font-bold"
+                       className="bg-primary text-white text-xs px-3 py-2 rounded font-medium hover:opacity-90 transition"
                      >
                        Assign
                      </button>
@@ -111,12 +111,12 @@ export const OrderView: React.FC<OrderViewProps> = ({ user }) => {
 
            {order.status === OrderStatus.ACCEPTED && (
              <div className="mt-4">
-               <div className="bg-yellow-50 p-3 rounded text-sm text-yellow-800 mb-3">
+               <div className="bg-yellow-50 p-3 rounded-md border border-yellow-100 text-sm text-yellow-800 mb-3">
                  Waiting for driver to arrive...
                </div>
                <button 
                  onClick={handleHandoff}
-                 className="w-full bg-secondary text-white py-3 rounded-lg font-bold"
+                 className="w-full bg-secondary text-white py-3 rounded-md font-medium transition hover:opacity-90"
                >
                  Confirm Handoff + Fee Paid
                </button>
@@ -125,10 +125,10 @@ export const OrderView: React.FC<OrderViewProps> = ({ user }) => {
 
            {order.status === OrderStatus.PAYMENT_SENT && (
               <div className="mt-4">
-                  <p className="text-sm mb-2">Client says they paid. Check your Mobile Money.</p>
+                  <p className="text-sm text-secondary mb-2">Client says they paid. Check your Mobile Money.</p>
                   <button 
                     onClick={handlePaymentReceived}
-                    className="w-full bg-primary text-white py-3 rounded-lg font-bold"
+                    className="w-full bg-primary text-white py-3 rounded-md font-medium transition hover:opacity-90"
                   >
                     Confirm Payment Received
                   </button>
@@ -148,8 +148,8 @@ export const OrderView: React.FC<OrderViewProps> = ({ user }) => {
 
      return (
         <div className="p-4 space-y-6">
-            <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
-                <h3 className="font-bold text-lg mb-2">Delivery Task</h3>
+            <div className="bg-surface p-4 rounded-lg border border-border">
+                <h3 className="font-semibold text-lg text-secondary mb-2">Delivery Task</h3>
                 {renderStatusBadge()}
 
                 {order.status === OrderStatus.ACCEPTED && (
@@ -158,13 +158,13 @@ export const OrderView: React.FC<OrderViewProps> = ({ user }) => {
 
                 {order.status === OrderStatus.HANDOFF_CONFIRMED && (
                     <div className="mt-4">
-                        <h4 className="font-bold text-sm mb-2">Proof of Delivery</h4>
-                        <p className="text-xs text-gray-500 mb-3">You MUST record a 5-10s video of the item in Client's hands.</p>
+                        <h4 className="font-semibold text-secondary text-sm mb-2">Proof of Delivery</h4>
+                        <p className="text-xs text-gray-500 mb-3">Record a short video of the item in Client's hands.</p>
                         
-                        <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+                        <label className="flex flex-col items-center justify-center w-full h-32 border border-dashed border-gray-300 rounded-md cursor-pointer bg-background hover:bg-gray-100 transition">
                             <div className="flex flex-col items-center justify-center pt-5 pb-6">
                                 <Video className="w-8 h-8 mb-2 text-gray-400" />
-                                <p className="text-sm text-gray-500">Tap to record video</p>
+                                <p className="text-sm text-gray-500 font-medium">Record video</p>
                             </div>
                             <input type="file" accept="video/*" capture="environment" className="hidden" onChange={handleVideoUpload} />
                         </label>
@@ -172,7 +172,7 @@ export const OrderView: React.FC<OrderViewProps> = ({ user }) => {
                 )}
                 
                 {order.status === OrderStatus.VIDEO_PROOF_UPLOADED && (
-                    <div className="mt-4 bg-green-50 p-3 rounded text-green-800 text-sm flex items-center">
+                    <div className="mt-4 bg-green-50 p-3 rounded-md border border-green-100 text-green-800 text-sm flex items-center">
                         <CheckCircle className="w-5 h-5 mr-2" />
                         Video uploaded. Waiting for client payment.
                     </div>
@@ -185,20 +185,20 @@ export const OrderView: React.FC<OrderViewProps> = ({ user }) => {
   // 3. Client View Logic (Default)
   return (
     <div className="p-4 space-y-6">
-      <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
-         <h3 className="font-bold text-lg mb-2">Order Status</h3>
+      <div className="bg-surface p-4 rounded-lg border border-border">
+         <h3 className="font-semibold text-lg text-secondary mb-2">Order Status</h3>
          {renderStatusBadge()}
 
          <div className="mt-4 space-y-4">
-            <div className="flex items-center text-sm text-gray-600">
+            <div className="flex items-center text-sm text-gray-600 bg-background p-3 rounded-md border border-border">
                 <Truck className="w-4 h-4 mr-2" />
                 <span>Driver: {order.driverId ? 'Charlie Driver' : 'Finding driver...'}</span>
             </div>
             
             {order.status === OrderStatus.VIDEO_PROOF_UPLOADED && (
-                <div className="animate-fade-in">
-                    <div className="bg-blue-50 p-3 rounded-lg border border-blue-100 mb-3">
-                        <p className="text-sm font-bold text-blue-900 flex items-center">
+                <div className="animate-fade-in space-y-3">
+                    <div className="bg-blue-50 p-3 rounded-md border border-blue-100">
+                        <p className="text-sm font-semibold text-blue-900 flex items-center">
                             <ShieldCheck className="w-4 h-4 mr-1" />
                             Delivery Verified
                         </p>
@@ -207,7 +207,7 @@ export const OrderView: React.FC<OrderViewProps> = ({ user }) => {
                     
                     <button 
                         onClick={handlePaymentSent}
-                        className="w-full bg-primary text-white py-3 rounded-lg font-bold shadow-lg"
+                        className="w-full bg-primary text-white py-3 rounded-md font-medium transition hover:opacity-90"
                     >
                         I Have Sent Payment
                     </button>
@@ -216,11 +216,11 @@ export const OrderView: React.FC<OrderViewProps> = ({ user }) => {
             )}
 
             {order.status === OrderStatus.COMPLETED && (
-                <div className="text-center py-4">
-                    <h4 className="font-bold text-primary text-xl">Order Complete!</h4>
+                <div className="text-center py-6">
+                    <h4 className="font-display font-semibold text-primary text-xl mb-1">Order Complete</h4>
                     <p className="text-sm text-gray-500 mb-4">Please rate your experience.</p>
                     <div className="flex justify-center space-x-2">
-                        {[1,2,3,4,5].map(star => <span key={star} className="text-2xl text-yellow-400 cursor-pointer">★</span>)}
+                        {[1,2,3,4,5].map(star => <span key={star} className="text-3xl text-yellow-400 cursor-pointer">★</span>)}
                     </div>
                 </div>
             )}
